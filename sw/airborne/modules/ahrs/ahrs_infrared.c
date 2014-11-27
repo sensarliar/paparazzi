@@ -20,7 +20,7 @@
  */
 
 /**
- * @file subsystems/ahrs/ahrs_infrared.c
+ * @file modules/ahrs/ahrs_infrared.c
  *
  * Attitude estimation using infrared sensors detecting the horizon.
  * For fixedwings only:
@@ -29,15 +29,25 @@
  *
  */
 
-#include "subsystems/ahrs/ahrs_infrared.h"
+#include "modules/ahrs/ahrs_infrared.h"
 
 #include "subsystems/sensors/infrared.h"
 #include "subsystems/imu.h"
 #include "subsystems/gps.h"
 
 #include "state.h"
+#include "subsystems/abi.h"
 
-float heading;
+static float heading;
+
+/** ABI binding for gyro data.
+ * Used for gyro ABI messages.
+ */
+#ifndef AHRS_INFRARED_GYRO_ID
+#define AHRS_INFRARED_GYRO_ID ABI_BROADCAST
+#endif
+static abi_event gyro_ev;
+
 
 #if PERIODIC_TELEMETRY
 #include "subsystems/datalink/telemetry.h"
@@ -55,10 +65,19 @@ static void send_status(struct transport_tx *trans, struct link_device *dev) {
 }
 #endif
 
-void ahrs_init(void) {
-  ahrs.status = AHRS_UNINIT;
 
+static void gyro_cb(uint8_t sender_id __attribute__((unused)),
+                    const uint32_t* stamp __attribute__((unused)),
+                    const struct Int32Rates* gyro)
+{
+  stateSetBodyRates_i((struct Int32Rates*)gyro);
+}
+
+void ahrs_infrared_init(void)
+{
   heading = 0.;
+
+  AbiBindMsgIMU_GYRO_INT32(AHRS_INFRARED_GYRO_ID, &gyro_ev, gyro_cb);
 
 #if PERIODIC_TELEMETRY
   register_periodic_telemetry(DefaultPeriodic, "IR_SENSORS", send_infrared);
@@ -66,30 +85,9 @@ void ahrs_init(void) {
 #endif
 }
 
-void ahrs_align(void) {
 
-  //TODO set gyro bias if used
-
-  ahrs.status = AHRS_RUNNING;
-}
-
-void ahrs_propagate(float dt __attribute__((unused))) {
-  struct FloatRates body_rate = { 0., 0., 0. };
-#ifdef ADC_CHANNEL_GYRO_P
-  body_rate.p = RATE_FLOAT_OF_BFP(imu.gyro.p);
-#endif
-#ifdef ADC_CHANNEL_GYRO_Q
-  body_rate.q = RATE_FLOAT_OF_BFP(imu.gyro.q);
-#endif
-#ifdef ADC_CHANNEL_GYRO_R
-  body_rate.r = RATE_FLOAT_OF_BFP(imu.gyro.r);
-#endif
-  stateSetBodyRates_f(&body_rate);
-}
-
-
-void ahrs_update_gps(void) {
-
+void ahrs_infrared_update_gps(void)
+{
   float hspeed_mod_f = gps.gspeed / 100.;
   float course_f = gps.course / 1e7;
 
@@ -103,7 +101,8 @@ void ahrs_update_gps(void) {
 
 }
 
-void ahrs_update_infrared(void) {
+void ahrs_infrared_periodic(void)
+{
   float phi  = atan2(infrared.roll, infrared.top) - infrared.roll_neutral;
   float theta  = atan2(infrared.pitch, infrared.top) - infrared.pitch_neutral;
 
@@ -118,6 +117,4 @@ void ahrs_update_infrared(void) {
 
   struct FloatEulers att = { phi, theta, heading };
   stateSetNedToBodyEulers_f(&att);
-
 }
-

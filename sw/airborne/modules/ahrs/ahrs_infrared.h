@@ -20,7 +20,7 @@
  */
 
 /**
- * @file subsystems/ahrs/ahrs_infrared.h
+ * @file modules/ahrs/ahrs_infrared.h
  *
  * Fixedwing attitude estimation using infrared sensors.
  *
@@ -29,9 +29,12 @@
 #ifndef AHRS_INFRARED_H
 #define AHRS_INFRARED_H
 
-#include "subsystems/ahrs.h"
 #include "std.h"
 
-extern void ahrs_update_infrared(void);
+extern void ahrs_infrared_init(void);
+extern void ahrs_infrared_periodic(void);
+extern void ahrs_infrared_update_gps(void);
+
+#define GPS_TRIGGERED_FUNCTION ahrs_infrared_update_gps
 
 #endif /* AHRS_INFRARED_H */

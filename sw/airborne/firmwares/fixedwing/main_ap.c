@@ -553,10 +553,6 @@ volatile uint8_t new_ins_attitude = 0;
 void attitude_loop(void)
 {
 
-#if USE_INFRARED
-  ahrs_update_infrared();
-#endif /* USE_INFRARED */
-
   if (pprz_mode >= PPRZ_MODE_AUTO2) {
     if (v_ctl_mode == V_CTL_MODE_AUTO_THROTTLE) {
       v_ctl_throttle_setpoint = nav_throttle_setpoint;
