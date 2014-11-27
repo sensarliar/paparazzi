@@ -335,12 +335,13 @@ STATIC_INLINE void main_event(void)
 
 static inline void on_accel_event(void)
 {
+  // current timestamp
+  uint32_t now_ts = get_sys_time_usec();
+
 #if USE_AUTO_AHRS_FREQ || !defined(AHRS_CORRECT_FREQUENCY)
   PRINT_CONFIG_MSG("Calculating dt for AHRS accel update.")
   // timestamp in usec when last callback was received
   static uint32_t last_ts = 0;
-  // current timestamp
-  uint32_t now_ts = get_sys_time_usec();
   // dt between this and last callback
   float dt = (float)(now_ts - last_ts) / 1e6;
   last_ts = now_ts;
@@ -352,6 +353,8 @@ static inline void on_accel_event(void)
 
   imu_scale_accel(&imu);
 
+  AbiSendMsgIMU_ACCEL_INT32(1, &now_ts, &imu.accel);
+
   if (ahrs.status != AHRS_UNINIT) {
     ahrs_update_accel(dt);
   }
@@ -359,12 +362,13 @@ static inline void on_accel_event(void)
 
 static inline void on_gyro_event(void)
 {
+  // current timestamp
+  uint32_t now_ts = get_sys_time_usec();
+
 #if USE_AUTO_AHRS_FREQ || !defined(AHRS_PROPAGATE_FREQUENCY)
   PRINT_CONFIG_MSG("Calculating dt for AHRS/INS propagation.")
   // timestamp in usec when last callback was received
   static uint32_t last_ts = 0;
-  // current timestamp
-  uint32_t now_ts = get_sys_time_usec();
   // dt between this and last callback in seconds
   float dt = (float)(now_ts - last_ts) / 1e6;
   last_ts = now_ts;
@@ -375,6 +379,8 @@ static inline void on_gyro_event(void)
 #endif
 
   imu_scale_gyro(&imu);
+
+  AbiSendMsgIMU_GYRO_INT32(1, &now_ts, &imu.gyro);
 
   if (ahrs.status == AHRS_UNINIT) {
     ahrs_aligner_run();
@@ -406,15 +412,14 @@ static inline void on_gps_event(void)
 
 static inline void on_mag_event(void)
 {
-  imu_scale_mag(&imu);
+  // current timestamp
+  uint32_t now_ts = get_sys_time_usec();
 
 #if USE_MAGNETOMETER
 #if USE_AUTO_AHRS_FREQ || !defined(AHRS_MAG_CORRECT_FREQUENCY)
   PRINT_CONFIG_MSG("Calculating dt for AHRS mag update.")
   // timestamp in usec when last callback was received
   static uint32_t last_ts = 0;
-  // current timestamp
-  uint32_t now_ts = get_sys_time_usec();
   // dt between this and last callback in seconds
   float dt = (float)(now_ts - last_ts) / 1e6;
   last_ts = now_ts;
@@ -423,6 +428,10 @@ static inline void on_mag_event(void)
   PRINT_CONFIG_VAR(AHRS_MAG_CORRECT_FREQUENCY)
   const float dt = 1. / (AHRS_MAG_CORRECT_FREQUENCY);
 #endif
+
+ imu_scale_mag(&imu);
+
+ AbiSendMsgIMU_MAG_INT32(1, &now_ts, &imu.mag);
 
   if (ahrs.status == AHRS_RUNNING) {
     ahrs_update_mag(dt);
