@@ -76,6 +76,14 @@ let get_autopilot_of_airframe = fun xml ->
     | [] -> raise Not_found
     | _ -> failwith "Error: you have more than one 'autopilot' section in your airframe file"
 
+let get_telemetry_of_airframe = fun xml ->
+  (* extract all "telemetry" tags *)
+  let section = List.filter (fun s -> compare (Xml.tag s) "telemetry" = 0) (Xml.children xml) in
+  match section with
+      [telemetry] -> (Xml.attrib telemetry "type")
+    | [] -> "none"
+    | telemetry -> (Xml.attrib (List.hd telemetry) "type")
+
 (** [get_modules_of_airframe xml]
     * Returns a list of module configuration from airframe file *)
 let rec get_modules_of_airframe = fun xml ->
