@@ -224,10 +224,10 @@ void imu_aspirin2_event(void)
     VECT3_ASSIGN(imu.mag_unscaled, -mag.x, -mag.y, mag.z);
 #endif
 #else
-    RATES_COPY(imu.gyro_unscaled, imu_aspirin2.mpu.data_rates.rates);
+    RATES_COPY(imu.gyro_unscaled, imu_aspirin2.mpu.data_rates.rates);  //this config is what we used
     VECT3_COPY(imu.accel_unscaled, imu_aspirin2.mpu.data_accel.vect);
 #if !ASPIRIN_2_DISABLE_MAG
-    VECT3_ASSIGN(imu.mag_unscaled, mag.y, -mag.x, mag.z)
+    VECT3_ASSIGN(imu.mag_unscaled, mag.y, -mag.x, mag.z)   //this config is what we used
 #endif
 #endif
 #endif

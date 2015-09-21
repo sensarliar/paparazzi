@@ -19,10 +19,14 @@
       <subsystem name="fdm" type="jsbsim"/>
     </target>
 
-    <subsystem name="radio_control" type="spektrum">
+    <subsystem name="radio_control" type="ppm">
+      <configure name="RADIO_CONTROL_PPM_PIN" value="SERV06"/>
+    </subsystem>
+
+    <!--subsystem name="radio_control" type="spektrum">
       <define name="RADIO_MODE" value="RADIO_AUX1"/>
       <configure name="USE_SECONDARY_SPEKTRUM_RECEIVER" value="1"/>
-    </subsystem>
+    </subsystem-->
 
     <subsystem name="motor_mixing"/>
     <subsystem name="actuators"     type="pwm">
@@ -65,6 +69,7 @@
   <section name="MIXING" prefix="MOTOR_MIXING_">
     <!-- front (CW), right (CCW), back (CW), left (CCW) -->
     <define name="TYPE" value="QUAD_PLUS"/>
+    <define name="MAX_SATURATION_OFFSET"	value="MAX_PPRZ/10"/>
   </section>
 
   <command_laws>
