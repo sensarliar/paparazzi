@@ -52,4 +52,5 @@
  <channel ctl="G" function="UNUSED"    min="950" neutral="1500" max="2050" average="1"/> <!-- center slider        -->
  <channel ctl="E" function="GAIN1"     min="948" neutral="1496" max="2050" average="1"/> <!-- top right slider     -->
  <channel ctl="PHAUX2" function="MODE"    min="1000" neutral="1500" max="2000" average="1"/> <!-- Top right switch -->
+ <channel ctl="H" function="EMPTY"    min="948" neutral="1500" max="2050" average="1"/> <!-- Top right switch -->
 </radio>
