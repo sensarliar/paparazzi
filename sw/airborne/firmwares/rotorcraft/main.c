@@ -366,7 +366,9 @@ STATIC_INLINE void main_event(void)
 
   DatalinkEvent();
 
+#pragma message "CAUTION! gaoming1, OUT LOOP!"
   if (autopilot_rc) {
+#pragma message "CAUTION! gaoming2, INNER LOOP!"
     RadioControlEvent(autopilot_on_rc_frame);
   }
 
