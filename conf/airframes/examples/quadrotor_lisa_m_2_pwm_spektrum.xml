@@ -206,6 +206,7 @@
     <define name="MODE_MANUAL" value="AP_MODE_ATTITUDE_DIRECT"/>
     <define name="MODE_AUTO1"  value="AP_MODE_HOVER_Z_HOLD"/>
     <define name="MODE_AUTO2"  value="AP_MODE_NAV"/>
+	<!--here is define how to arming your motors;eg.   define name="USE_THROTTLE_FOR_MOTOR_ARMING" value="TRUE"  USE_KILL_SWITCH_FOR_MOTOR_ARMING, -->
   </section>
 
   <section name="BAT">
