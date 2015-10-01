@@ -32,7 +32,7 @@
 #include "subsystems/radio_control.h"
 
 #define AUTOPILOT_THROTTLE_THRESHOLD      (MAX_PPRZ / 20)
-#define AUTOPILOT_YAW_THRESHOLD           (MAX_PPRZ * 19 / 20)
+#define AUTOPILOT_YAW_THRESHOLD           (MAX_PPRZ * 15 / 20)
 #ifndef AUTOPILOT_STICK_CENTER_THRESHOLD
 #define AUTOPILOT_STICK_CENTER_THRESHOLD  (MAX_PPRZ * 1 / 20)
 #endif
