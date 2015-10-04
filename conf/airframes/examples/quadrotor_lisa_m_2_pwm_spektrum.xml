@@ -67,9 +67,10 @@
   </commands>
 
   <section name="MIXING" prefix="MOTOR_MIXING_">
-    <!-- front (CW), right (CCW), back (CW), left (CCW) -->
+    <!-- front (CW), right (CCW), back (CW), left (CCW), yaw reverse -->
     <define name="TYPE" value="QUAD_PLUS"/>
-    <define name="MAX_SATURATION_OFFSET"	value="MAX_PPRZ/10"/>
+    <define name="REVERSE"	value="TRUE"/>
+
   </section>
 
   <command_laws>
