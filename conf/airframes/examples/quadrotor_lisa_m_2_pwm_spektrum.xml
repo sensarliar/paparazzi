@@ -13,6 +13,8 @@
   <firmware name="rotorcraft">
     <target name="ap" board="lisa_m_2.0">
       <!-- MPU6000 is configured to output data at 2kHz, but polled at 512Hz PERIODIC_FREQUENCY -->
+      <!-- baro board options for Lisa/M 2.0: BARO_BOARD_BMP085, BARO_MS5611_I2C, BARO_MS5611_SPI (default) ,use bmp085 in my board-->
+      <configure name="LISA_M_BARO" value="BARO_BOARD_BMP085"/>
     </target>
 
     <target name="nps" board="pc">

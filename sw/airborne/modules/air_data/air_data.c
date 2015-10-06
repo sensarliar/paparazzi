@@ -66,23 +66,23 @@ static abi_event temperature_ev;
 
 /** Calculate Airspeed from differential pressure by default */
 #ifndef AIR_DATA_CALC_AIRSPEED
-#define AIR_DATA_CALC_AIRSPEED TRUE
+#define AIR_DATA_CALC_AIRSPEED FALSE
 #endif
 
 /** Calculate tas_factor from temp and pressure by default */
 #ifndef AIR_DATA_CALC_TAS_FACTOR
-#define AIR_DATA_CALC_TAS_FACTOR TRUE
+#define AIR_DATA_CALC_TAS_FACTOR FALSE
 #endif
 
 /** Don't calculate AMSL from baro and QNH by default */
 #ifndef AIR_DATA_CALC_AMSL_BARO
-#define AIR_DATA_CALC_AMSL_BARO FALSE
+#define AIR_DATA_CALC_AMSL_BARO TRUE
 #endif
 
 
 #ifndef USE_AIRSPEED_AIR_DATA
 #if USE_AIRSPEED
-#define USE_AIRSPEED_AIR_DATA TRUE
+#define USE_AIRSPEED_AIR_DATA FALSE
 PRINT_CONFIG_MSG("USE_AIRSPEED_AIR_DATA automatically set to TRUE")
 #endif
 #endif
