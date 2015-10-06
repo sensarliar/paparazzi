@@ -133,6 +133,9 @@
   </section>
 
   <section name="INS" prefix="INS_">
+    <define name="BODY_TO_GPS_X" value="-11"/>
+    <define name="BODY_TO_GPS_Y" value="11"/>
+    <define name="BODY_TO_GPS_Z" value="-14"/>
   </section>
 
   <section name="STABILIZATION_RATE" prefix="STABILIZATION_RATE_">
