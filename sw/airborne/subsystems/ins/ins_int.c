@@ -310,7 +310,7 @@ static void baro_cb(uint8_t __attribute__((unused)) sender_id, float pressure)
     } else {
       ins_int.baro_z = -pprz_isa_height_of_pressure(pressure, ins_int.qfe);
 #if USE_VFF_EXTENDED
-      vff_update_baro(ins_int.baro_z);
+      vff_update_baro(ins_int.baro_z);	// R =1
 #else
       vff_update(ins_int.baro_z);
 #endif

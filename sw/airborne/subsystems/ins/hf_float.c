@@ -69,17 +69,17 @@
 #define INIT_PXX 1.
 /** process noise (is the same for x and y)*/
 #ifndef HFF_ACCEL_NOISE
-#define HFF_ACCEL_NOISE 0.5
+#define HFF_ACCEL_NOISE 0.5	//fangcha ,D(x)= E(e*eT) not stard diviation
 #endif
 #define Q       HFF_ACCEL_NOISE*DT_HFILTER*DT_HFILTER/2.
 #define Qdotdot HFF_ACCEL_NOISE*DT_HFILTER
 
 //TODO: proper measurement noise
 #ifndef HFF_R_POS
-#define HFF_R_POS   8.
+#define HFF_R_POS   8.   //fangcha ,D(x)= E(e*eT) not stard diviation
 #endif
 #ifndef HFF_R_POS_MIN
-#define HFF_R_POS_MIN 3.
+#define HFF_R_POS_MIN 3.   
 #endif
 
 #ifndef HFF_R_SPEED
@@ -534,7 +534,7 @@ void b2_hff_update_gps(struct FloatVect2 *pos_ned, struct FloatVect2 *speed_ned)
   b2_hff_lost_counter = 0;
 
 #if USE_GPS_ACC4R
-  Rgps_pos = (float) gps.pacc / 100.;
+  Rgps_pos = (float) gps.pacc / 100.;		//pacc is stard divation, not D(x) should be x*x
   if (Rgps_pos < HFF_R_POS_MIN) {
     Rgps_pos = HFF_R_POS_MIN;
   }

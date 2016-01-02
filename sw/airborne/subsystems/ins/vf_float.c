@@ -44,12 +44,12 @@ temps :
 #define VF_FLOAT_INIT_PXX 1.0
 #endif
 
-/* process noise covariance Q */
+/* process noise covariance Q  accel all is 0.5*/
 #ifndef VF_FLOAT_ACCEL_NOISE
 #define VF_FLOAT_ACCEL_NOISE 0.5
 #endif
 
-/* measurement noise covariance R */
+/* measurement noise covariance R  baro hight 1, gps hight 2*/
 #ifndef VF_FLOAT_MEAS_NOISE
 #define VF_FLOAT_MEAS_NOISE 1.0
 #endif
