@@ -37,12 +37,14 @@
 #define VFF_INIT_PXX 1.0
 #endif
 
-/** process noise covariance Q */
+/* process noise covariance Q */
+/* process noise covariance Q  accel all is 0.5*/
 #ifndef VFF_ACCEL_NOISE
 #define VFF_ACCEL_NOISE 0.5
 #endif
 
-/** measurement noise covariance R */
+/* measurement noise covariance R */
+/* measurement noise covariance R  baro hight 1, gps hight 2*/
 #ifndef VFF_MEAS_NOISE
 #define VFF_MEAS_NOISE 1.0
 #endif
