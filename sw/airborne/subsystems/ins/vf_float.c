@@ -157,7 +157,7 @@ static inline void update_z_conf(float z_meas, float conf)
   vff.z_meas = z_meas;
 
   const float y = z_meas - vff.z;
-  const float S = vff.P[0][0] + conf;
+  const float S = vff.P[0][0] + conf*conf;
   const float K1 = vff.P[0][0] * 1 / S;
   const float K2 = vff.P[1][0] * 1 / S;
   const float K3 = vff.P[2][0] * 1 / S;
@@ -215,7 +215,7 @@ void vff_update_z_conf(float z_meas, float conf)
 static inline void update_vz_conf(float vz, float conf)
 {
   const float yd = vz - vff.zdot;
-  const float S = vff.P[1][1] + conf;
+  const float S = vff.P[1][1] + conf*conf;
   const float K1 = vff.P[0][1] * 1 / S;
   const float K2 = vff.P[1][1] * 1 / S;
   const float K3 = vff.P[2][1] * 1 / S;

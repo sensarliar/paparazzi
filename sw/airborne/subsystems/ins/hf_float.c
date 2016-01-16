@@ -693,7 +693,7 @@ static void b2_hff_update_x(struct HfilterFloat *hff_work, float x_meas, float R
   b2_hff_x_meas = x_meas;
 
   const float y  = x_meas - hff_work->x;
-  const float S  = hff_work->xP[0][0] + Rpos;
+  const float S  = hff_work->xP[0][0] + Rpos*Rpos;
   const float K1 = hff_work->xP[0][0] * 1 / S;
   const float K2 = hff_work->xP[1][0] * 1 / S;
 
@@ -716,7 +716,7 @@ static void b2_hff_update_y(struct HfilterFloat *hff_work, float y_meas, float R
   b2_hff_y_meas = y_meas;
 
   const float y  = y_meas - hff_work->y;
-  const float S  = hff_work->yP[0][0] + Rpos;
+  const float S  = hff_work->yP[0][0] + Rpos*Rpos;
   const float K1 = hff_work->yP[0][0] * 1 / S;
   const float K2 = hff_work->yP[1][0] * 1 / S;
 
@@ -765,7 +765,7 @@ static void b2_hff_update_xdot(struct HfilterFloat *hff_work, float vel, float R
   b2_hff_xd_meas = vel;
 
   const float yd = vel - hff_work->xdot;
-  const float S  = hff_work->xP[1][1] + Rvel;
+  const float S  = hff_work->xP[1][1] + Rvel*Rvel;
   const float K1 = hff_work->xP[0][1] * 1 / S;
   const float K2 = hff_work->xP[1][1] * 1 / S;
 
@@ -788,7 +788,7 @@ static void b2_hff_update_ydot(struct HfilterFloat *hff_work, float vel, float R
   b2_hff_yd_meas = vel;
 
   const float yd = vel - hff_work->ydot;
-  const float S  = hff_work->yP[1][1] + Rvel;
+  const float S  = hff_work->yP[1][1] + Rvel*Rvel;
   const float K1 = hff_work->yP[0][1] * 1 / S;
   const float K2 = hff_work->yP[1][1] * 1 / S;
 
