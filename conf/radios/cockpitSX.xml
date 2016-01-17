@@ -49,7 +49,7 @@
  <channel ctl="C" function="PITCH"    min="950" neutral="1519" max="2050" average="0"/>
  <channel ctl="A" function="THROTTLE" min="1223" neutral="1223" max="2020" average="0"/>
  <channel ctl="D" function="ROLL"     min="950" neutral="1519" max="2050" average="0"/>
- <channel ctl="G" function="UNUSED"    min="950" neutral="1500" max="2050" average="1"/> <!-- center slider        -->
+ <channel ctl="G" function="AUTO_MODE"    min="950" neutral="1500" max="2050" average="1"/> <!-- RIGHT DOWN SWITH ::::gm        -->
  <channel ctl="E" function="GAIN1"     min="948" neutral="1496" max="2050" average="1"/> <!-- top right slider     -->
  <channel ctl="PHAUX2" function="MODE"    min="1016" neutral="1519" max="2021" average="1"/> <!-- Top right switch -->
  <channel ctl="H" function="EMPTY"    min="948" neutral="1500" max="2050" average="1"/> <!-- Top right switch -->
