@@ -203,6 +203,10 @@
     <define name="PSI_DGAIN"  value="300"/>
     <define name="PSI_IGAIN"  value="10"/>
 
+    <!--it's for hooperfly psi gain, 5 times much larger 
+	define name="PSI_PGAIN"  value="2820"/>
+    <define name="PSI_DGAIN"  value="1536"/>
+    <define name="PSI_IGAIN"  value="10"/-->
     <!-- feedforward -->
     <define name="PHI_DDGAIN"   value="300"/>
     <define name="THETA_DDGAIN" value="300"/>
@@ -239,9 +243,9 @@
   </section>
 
   <section name="AUTOPILOT">
-    <define name="MODE_MANUAL" value="AP_MODE_HOVER_DIRECT"/>
+    <define name="MODE_MANUAL" value="AP_MODE_ATTITUDE_DIRECT"/>
     <define name="MODE_AUTO1"  value="AP_MODE_HOVER_Z_HOLD"/>
-    <define name="MODE_AUTO2"  value="AP_MODE_NAV"/>
+    <define name="MODE_AUTO2"  value="AP_MODE_HOVER_DIRECT"/>
 	<!--here is define how to arming your motors;eg.   define name="USE_THROTTLE_FOR_MOTOR_ARMING" value="TRUE"  USE_KILL_SWITCH_FOR_MOTOR_ARMING, 
     <define name="MODE_MANUAL" value="AP_MODE_ATTITUDE_DIRECT"/>
  <define name="MODE_AUTO2"  value="AP_MODE_NAV"/>-->
