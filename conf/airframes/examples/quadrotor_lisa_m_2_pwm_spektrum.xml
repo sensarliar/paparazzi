@@ -41,7 +41,15 @@
     <subsystem name="gps"           type="ublox"/>
     <subsystem name="stabilization" type="int_quat"/>
     <subsystem name="ahrs"          type="int_cmpl_quat">
-      <define name="AHRS_GRAVITY_HEURISTIC_FACTOR" value="30"/>
+      <define name="AHRS_GRAVITY_HEURISTIC_FACTOR" value="0"/>
+	    <!-- Uncomment to enable all axis update from the Magnetometer. Do
+		 it only if you have a very well calibrated and tested
+		 magnetometer otherwise your attitude will drift.
+and the foam should be more softly;
+and mag update_all_axes is no help
+ -->
+      <!--define name="AHRS_MAG_UPDATE_ALL_AXES" value="1"/-->
+
     </subsystem>
     <subsystem name="ins_hff">
       <!--define name="USE_HFF" /-->
@@ -244,7 +252,7 @@
 
   <section name="AUTOPILOT">
     <define name="MODE_MANUAL" value="AP_MODE_ATTITUDE_DIRECT"/>
-    <define name="MODE_AUTO1"  value="AP_MODE_HOVER_Z_HOLD"/>
+    <define name="MODE_AUTO1"  value="AP_MODE_NAV"/>
     <define name="MODE_AUTO2"  value="AP_MODE_HOVER_DIRECT"/>
 	<!--here is define how to arming your motors;eg.   define name="USE_THROTTLE_FOR_MOTOR_ARMING" value="TRUE"  USE_KILL_SWITCH_FOR_MOTOR_ARMING, 
     <define name="MODE_MANUAL" value="AP_MODE_ATTITUDE_DIRECT"/>

@@ -155,7 +155,7 @@ def print_xml(p, sensor, res):
 def print_imu_scaled(sensor, measurements, attrs):
     print("")
     print(sensor+" : Time Range("+str(measurements[:,0].min(axis=0))+" : "+str(measurements[:,0].max(axis=0))+")")
-    np.set_printoptions(formatter={'float': '{:-7.3f}'.format})
+    #np.set_printoptions(formatter={'float': '{:-7.3f}'.format})
     print("         " + attrs[2] + "      " + attrs[3] + "      " + attrs[4])
     print("Min   " + str(measurements[:,1:].min(axis=0)*attrs[0])  + " " + attrs[1])
     print("Max   " + str(measurements[:,1:].max(axis=0)*attrs[0])  + " " + attrs[1])
