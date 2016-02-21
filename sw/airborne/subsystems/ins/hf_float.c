@@ -49,6 +49,9 @@
 
 #ifndef AHRS_PROPAGATE_FREQUENCY
 #define AHRS_PROPAGATE_FREQUENCY PERIODIC_FREQUENCY
+#pragma message "gm not define AHRS_PROPAGATE_FREQUENCY!"
+#else
+#pragma message "gm  define AHRS_PROPAGATE_FREQUENCY!"
 #endif
 
 #ifndef HFF_PRESCALER

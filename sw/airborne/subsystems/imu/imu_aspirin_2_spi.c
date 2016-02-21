@@ -57,6 +57,7 @@ PRINT_CONFIG_MSG("Gyro/Accel output rate is 100Hz at 1kHz internal sampling")
 #define ASPIRIN_2_LOWPASS_FILTER MPU60X0_DLPF_256HZ
 #define ASPIRIN_2_SMPLRT_DIV 3
 PRINT_CONFIG_MSG("Gyro/Accel output rate is 2kHz at 8kHz internal sampling")
+#pragma message "gm PERIODIC_FREQUENCY = 512,it was polled by message order, and no propagate_frequency was defined! defined by some wrapper; maybe it seems to be 512"
 #else
 #error Non-default PERIODIC_FREQUENCY: please define ASPIRIN_2_LOWPASS_FILTER and ASPIRIN_2_SMPLRT_DIV.
 #endif

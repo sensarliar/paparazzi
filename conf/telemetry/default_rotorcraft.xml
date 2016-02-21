@@ -70,13 +70,19 @@
       <message name="ARDRONE_NAVDATA" period=".05"/>
     </mode>
 
-    <mode name="scaled_sensors">
+    <!--mode name="scaled_sensors">
       <message name="ROTORCRAFT_STATUS"      period="1.2"/>
       <message name="DL_VALUE"               period="0.5"/>
       <message name="ALIVE"                  period="2.1"/>
       <message name="IMU_GYRO_SCALED"        period=".075"/>
       <message name="IMU_ACCEL_SCALED"       period=".075"/>
       <message name="IMU_MAG_SCALED"         period=".1"/>
+    </mode-->
+
+    <mode name="scaled_sensors">
+      <!--message name="IMU_GYRO_SCALED"        period=".006"/-->
+      <message name="IMU_ACCEL_SCALED"       period=".006"/>
+      <!--message name="IMU_MAG_SCALED"         period=".01"/-->
     </mode>
 
     <mode name="ahrs">
