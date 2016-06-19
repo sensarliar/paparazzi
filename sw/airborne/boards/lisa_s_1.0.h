@@ -189,7 +189,7 @@
  */
 
 /*
- * Default is PPM config 2, input on GPIO01 (Servo pin 6)
+ * Default is PPM config 3, input on PA3 (Aux RX pin)
  */
 
 #ifndef PPM_CONFIG
@@ -250,6 +250,19 @@
 #undef USE_AD_TIM2
 #endif
 #define USE_AD_TIM1 1
+
+#elif PPM_CONFIG == 4
+/* Input on PC9 (SUPERBIT_RST) */
+#define USE_PPM_TIM3 1
+#define PPM_CHANNEL         TIM_IC4
+#define PPM_TIMER_INPUT     TIM_IC_IN_TI4
+#define PPM_IRQ             NVIC_TIM3_IRQ
+// Capture/Compare InteruptEnable and InterruptFlag
+#define PPM_CC_IE           TIM_DIER_CC4IE
+#define PPM_CC_IF           TIM_SR_CC4IF
+#define PPM_GPIO_PORT       GPIOC
+#define PPM_GPIO_PIN        GPIO9
+#define PPM_GPIO_AF         AFIO_MAPR_TIM3_REMAP_FULL_REMAP
 
 #else
 #error "Unknown PPM config"
@@ -369,12 +382,10 @@
 #define PWM_SERVO_5_OC TIM_OC1
 #define PWM_SERVO_5_OC_BIT (1<<0)
 #elif USE_DUAL_PWM5
-#define DUAL_PWM_SERVO_5 2
-
-#define FIRST_DUAL_PWM_SERVO DUAL_PWM_SERVO_5
+#define DUAL_PWM_SERVO_5_P1 0
+#define DUAL_PWM_SERVO_5_P2 1
 
 #define DUAL_PWM_SERVO_5_TIMER TIM5
-#define DUAL_PWM_SERVO_5_RCC RCC_GPIOA
 #define DUAL_PWM_SERVO_5_GPIO GPIOA
 #define DUAL_PWM_SERVO_5_PIN GPIO0
 #define DUAL_PWM_SERVO_5_AF 0
@@ -393,12 +404,10 @@
 #define PWM_SERVO_6_OC TIM_OC2
 #define PWM_SERVO_6_OC_BIT (1<<1)
 #elif USE_DUAL_PWM6
-#define DUAL_PWM_SERVO_6 3
-
-#define SECOND_DUAL_PWM_SERVO DUAL_PWM_SERVO_6
+#define DUAL_PWM_SERVO_6_P1 2
+#define DUAL_PWM_SERVO_6_P2 3
 
 #define DUAL_PWM_SERVO_6_TIMER TIM5
-#define DUAL_PWM_SERVO_6_RCC RCC_GPIOA
 #define DUAL_PWM_SERVO_6_GPIO GPIOA
 #define DUAL_PWM_SERVO_6_PIN GPIO1
 #define DUAL_PWM_SERVO_6_AF 0
@@ -421,5 +430,32 @@
 #define SUPERBITRF_DRDY_PORT GPIOC
 #define SUPERBITRF_DRDY_PIN GPIO6
 #define SUPERBITRF_FORCE_DSM2 FALSE
+
+/*
+ * RPM sensor on Superbit IRQ pin using TIM8 Channel 1
+ */
+#ifdef USE_PWM_INPUT1
+#define PWM_INPUT1_GPIO_PORT      GPIOC
+#define PWM_INPUT1_GPIO_PIN       GPIO6
+#define PWM_INPUT1_GPIO_AF        0
+
+#define PWM_INPUT1_TIMER          TIM8
+#define PWM_INPUT1_CHANNEL_PERIOD TIM_IC1
+#define PWM_INPUT1_CHANNEL_DUTY   TIM_IC2
+#define PWM_INPUT1_TIMER_INPUT    TIM_IC_IN_TI1
+#define PWM_INPUT1_SLAVE_TRIG     TIM_SMCR_TS_IT1FP1
+#define PWM_INPUT1_IRQ            NVIC_TIM8_CC_IRQ
+#define PWM_INPUT1_CC_IE          (TIM_DIER_CC1IE | TIM_DIER_CC2IE)
+#define USE_PWM_INPUT_TIM8        TRUE
+
+#ifdef PWM_INPUT1_TICKS_PER_USEC
+#define TIM8_TICKS_PER_USEC PWM_INPUT1_TICKS_PER_USEC
+#endif
+#define TIM8_PWM_INPUT_IDX        0
+#define TIM8_CC_IF_PERIOD         TIM_SR_CC1IF
+#define TIM8_CC_IF_DUTY           TIM_SR_CC2IF
+#define TIM8_CCR_PERIOD           TIM8_CCR1
+#define TIM8_CCR_DUTY             TIM8_CCR2
+#endif
 
 #endif /* CONFIG_LISA_S_1_0_H */

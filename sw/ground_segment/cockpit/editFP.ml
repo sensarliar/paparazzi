@@ -63,6 +63,7 @@ let close_fp = fun geomap ->
     | Some (fp, _filename) ->
       let close = fun () ->
         fp#destroy ();
+        geomap#clear_georefs ();
         current_fp := None in
       match GToolbox.question_box ~title:"Closing flight plan" ~buttons:["Close"; "Save&Close"; "Cancel"] "Do you want to save/close ?" with
           2 -> save_fp geomap; close ()
@@ -115,7 +116,7 @@ let new_fp = fun geomap editor_frame accel_group () ->
     createfp#grab_default ();
     ignore(createfp#connect#clicked ~callback:
              begin fun _ ->
-               let xml = Xml.parse_file fp_example in
+               let xml = ExtXml.parse_file fp_example in
                let s = ExtXml.subst_attrib in
                let wgs84 = Latlong.of_string latlong#text in
                let xml = s "lat0" (deg_string_of_rad wgs84.posn_lat) xml in

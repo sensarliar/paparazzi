@@ -75,7 +75,7 @@ let fill_data = fun (treeview:GTree.view) (model:GTree.tree_store) messages_xml 
 	treeview#expand_row (model#get_path parent);
       model#set ~row ~column:col_to_export to_export;
       model#set ~row ~column:col_field field_name)
-      (Xml.children msg))
+      (List.filter (fun x -> Xml.tag x = "field") (Xml.children msg)))
     (Xml.children messages_xml)
 
 type timestamp =
@@ -140,7 +140,7 @@ let export_values = fun ?(sep="tab") ?(export_geo_pos=true) (model:GTree.tree_st
 
   (* Save preferences *)
   let value = String.concat ";" (List.map (fun (msg, field) -> sprintf "%s:%s" msg field) !fields_to_export) in
-  let xml = if Sys.file_exists Env.gconf_file then Xml.parse_file Env.gconf_file else Xml.Element ("gconf", [], []) in
+  let xml = if Sys.file_exists Env.gconf_file then ExtXml.parse_file Env.gconf_file else Xml.Element ("gconf", [], []) in
   let xml = ExtXml.Gconf.add_entry xml "log plotter" "to_export" value in
   let f = open_out Env.gconf_file in
   Printf.fprintf f "%s\n" (ExtXml.to_string_fmt xml);
@@ -165,7 +165,7 @@ let export_values = fun ?(sep="tab") ?(export_geo_pos=true) (model:GTree.tree_st
 
     let lookup = fun m field  ->
       try
-	Pprz.string_of_value (Hashtbl.find last_values (m,String.lowercase field))
+	PprzLink.string_of_value (Hashtbl.find last_values (m,String.lowercase field))
       with
 	Not_found -> "" in
 
@@ -232,7 +232,7 @@ let export_values = fun ?(sep="tab") ?(export_geo_pos=true) (model:GTree.tree_st
 let read_preferences = fun () ->
   if Sys.file_exists Env.gconf_file then
     try
-      let xml = Xml.parse_file Env.gconf_file in
+      let xml = ExtXml.parse_file Env.gconf_file in
       let to_export = ExtXml.Gconf.get_value xml "to_export" in
       let pairs = Str.split (Str.regexp ";") to_export in
       List.map

@@ -24,6 +24,7 @@
 
 open Printf
 
+
 let (//) = Filename.concat
 
 
@@ -33,9 +34,14 @@ object
   method xml = xml
   val mutable last_known_value = None
   method last_known_value =
-    match last_known_value with None -> raise Not_found | Some v -> v
+    match last_known_value with
+    | None -> raise Not_found
+    | Some v ->
+        let auc = PprzLink.alt_unit_coef_of_xml xml in
+        let (alt_a, alt_b) = Ocaml_tools.affine_transform auc in
+        (v -. alt_b) /. alt_a
   method current_value =
-    let auc = Pprz.alt_unit_coef_of_xml xml in
+    let auc = PprzLink.alt_unit_coef_of_xml xml in
     let (alt_a, alt_b) = Ocaml_tools.affine_transform auc in
     (float_of_string current_value#text -. alt_b) /. alt_a
   method update = fun s ->
@@ -69,13 +75,13 @@ let search_index = fun value array ->
 
 
 let add_key = fun xml do_change keys ->
-  let key, modifiers = GtkData.AccelGroup.parse (Pprz.key_modifiers_of_string (Xml.attrib xml "key"))
+  let key, modifiers = GtkData.AccelGroup.parse (Env.key_modifiers_of_string (Xml.attrib xml "key"))
   and value = ExtXml.float_attrib xml "value" in
   keys := (key, (modifiers, fun () -> do_change value)) :: !keys
 
 
 
-let one_setting = fun (i:int) (do_change:int -> float -> unit) packing dl_setting (tooltips:GData.tooltips) strip keys ->
+let one_setting = fun (i:int) (do_change:int -> float -> unit) ac_id packing dl_setting (tooltips:GData.tooltips) icons_theme strip keys ->
   let f = fun a -> float_of_string (ExtXml.attrib dl_setting a) in
   let lower = f "min"
   and upper = f "max"
@@ -85,11 +91,11 @@ let one_setting = fun (i:int) (do_change:int -> float -> unit) packing dl_settin
       1.
   in
   (* get number of digits after decimal dot *)
-  let digits = try String.length (ExtXml.attrib dl_setting "step") - String.index (ExtXml.attrib dl_setting "step") '.' - 1 with _ -> 0 in
+  let digits = try Compat.bytes_length (ExtXml.attrib dl_setting "step") - Compat.bytes_index (ExtXml.attrib dl_setting "step") '.' - 1 with _ -> 0 in
   let page_incr = step_incr
   and page_size = step_incr
   and show_auto = try ExtXml.attrib dl_setting "auto" = "true" with _ -> false in
-  let auc = Pprz.alt_unit_coef_of_xml dl_setting in
+  let auc = PprzLink.alt_unit_coef_of_xml dl_setting in
   let (alt_a, alt_b) = Ocaml_tools.affine_transform auc in
 
   let hbox = GPack.hbox ~packing () in
@@ -194,6 +200,9 @@ let one_setting = fun (i:int) (do_change:int -> float -> unit) packing dl_settin
   let set_default = fun x ->
     if not !modified then set_default x else () in
 
+  (* build setting *)
+  let setting = new setting i dl_setting current_value set_default in
+
   (* click current_value label to request an update, a value of infinity for do_change requests new value *)
   let callback = fun _ ->
     do_change i infinity;
@@ -210,8 +219,12 @@ let one_setting = fun (i:int) (do_change:int -> float -> unit) packing dl_settin
   let commit_but = GButton.button ~packing:hbox#pack () in
   commit_but#set_border_width 2;
   let _icon = GMisc.image ~stock:`APPLY ~packing:commit_but#add () in
+  let idx = ref 0 in
   let callback = fun x ->
-    prev_value := (try Some ((float_of_string current_value#text-.alt_b)/.alt_a) with _ -> None);
+    prev_value := (try Some setting#last_known_value with _ ->
+      idx := -1;
+      Array.iteri (fun i v -> if current_value#text = v then idx := i) values;
+      if !idx >= 0 then Some (lower +. (float_of_int !idx)) else None);
     commit x;
     current_value#set_text "?"
   in
@@ -236,7 +249,7 @@ let one_setting = fun (i:int) (do_change:int -> float -> unit) packing dl_settin
 
   (** Insert the related buttons in the strip and prepare the papgets DnD *)
   List.iter (fun x ->
-    match String.lowercase (Xml.tag x) with
+    match Compat.bytes_lowercase (Xml.tag x) with
         "strip_button" ->
           let label = ExtXml.attrib x "name"
           and sp_value = ExtXml.float_attrib x "value"
@@ -245,14 +258,15 @@ let one_setting = fun (i:int) (do_change:int -> float -> unit) packing dl_settin
             try (* Is it an icon ? *)
               let icon = Xml.attrib x "icon" in
               let b = GButton.button () in
-              let pixbuf = GdkPixbuf.from_file (Env.gcs_icons_path // icon) in
+              let pixbuf = GdkPixbuf.from_file (Env.get_gcs_icon_path icons_theme icon) in
               ignore (GMisc.image ~pixbuf ~packing:b#add ());
 
               (* Drag for Drop *)
               let papget = Papget_common.xml "variable_setting" "button"
                 ["variable", varname;
                  "value", ExtXml.attrib x "value";
-                 "icon", icon] in
+                 "ac_id", ac_id;
+                 "icon", icons_theme // icon] in
               Papget_common.dnd_source b#coerce papget;
 
               (* Associates the label as a tooltip *)
@@ -269,7 +283,8 @@ let one_setting = fun (i:int) (do_change:int -> float -> unit) packing dl_settin
       | t -> failwith (sprintf "Page_settings.one_setting, Unexpected tag: '%s'" t))
     (Xml.children dl_setting);
 
-  new setting i dl_setting current_value set_default
+  (* return setting *)
+  setting
 
 
 
@@ -278,16 +293,16 @@ let same_tag_for_all = function
   | x::xs ->
     let tag_first = Xml.tag x in
     List.iter (fun y -> assert(ExtXml.tag_is y tag_first)) xs;
-    String.lowercase tag_first
+    Compat.bytes_lowercase tag_first
 
 
 (** Build the tree of settings *)
-let rec build_settings = fun do_change i flat_list keys xml_settings packing tooltips strip ->
+let rec build_settings = fun do_change ac_id i flat_list keys xml_settings packing tooltips icons_theme strip ->
   match same_tag_for_all xml_settings with
       "dl_setting" ->
         List.iter
           (fun dl_setting ->
-            let label_value = one_setting !i do_change packing dl_setting tooltips strip keys in
+            let label_value = one_setting !i do_change ac_id packing dl_setting tooltips icons_theme strip keys in
             flat_list := label_value :: !flat_list;
             incr i)
           xml_settings
@@ -303,18 +318,18 @@ let rec build_settings = fun do_change i flat_list keys xml_settings packing too
         ignore (n#append_page ~tab_label vbox#coerce);
 
         let children = Xml.children dl_settings in
-        build_settings do_change i flat_list keys children vbox#pack tooltips strip)
+        build_settings do_change ac_id i flat_list keys children vbox#pack tooltips icons_theme strip)
         xml_settings
     | tag -> failwith (sprintf "Page_settings.build_settings, unexpected tag '%s'" tag)
 
 
-class settings = fun ?(visible = fun _ -> true) xml_settings do_change strip ->
+class settings = fun ?(visible = fun _ -> true) xml_settings do_change ac_id icons_theme strip ->
   let sw = GBin.scrolled_window ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC () in
   let vbox = GPack.vbox ~packing:sw#add_with_viewport () in
   let tooltips = GData.tooltips () in
   let i = ref 0 and l = ref [] and keys = ref [] in
   let ordered_list =
-    build_settings do_change i l keys xml_settings vbox#add tooltips strip;
+    build_settings do_change ac_id i l keys xml_settings vbox#add tooltips icons_theme strip;
     List.rev !l in
   let variables = Array.of_list ordered_list in
   let length = Array.length variables in
@@ -331,7 +346,7 @@ object (self)
         | None -> "?", -1
         | Some x ->
           let v = try float_of_string x with _ -> failwith (sprintf "Pages.settings#set:wrong values.(%d) = %s" i x) in
-          let auc = Pprz.alt_unit_coef_of_xml setting#xml in
+          let auc = PprzLink.alt_unit_coef_of_xml setting#xml in
           let (alt_a, alt_b) = Ocaml_tools.affine_transform auc in
           let v = alt_a *. v +. alt_b in
           string_of_float v, truncate v
@@ -351,4 +366,3 @@ object (self)
     let settings = Array.fold_right (fun setting r -> try (setting#index, setting#xml, setting#last_known_value)::r with _ -> r) variables [] in
     SaveSettings.popup airframe_filename (Array.of_list settings) do_change
 end
-

@@ -270,7 +270,7 @@ let coeff_proj_mercator_inverse =
     [|0.;0.;0.; 17./.30720.;283./.430080.|];
     [|0.;0.;0.;0.;4397./.41287680.|]|];;
 
-let utm_of' = fun geo ->
+let utm_of' = fun ?zone geo ->
   let ellipsoid =  ellipsoid_of geo in
   let k0 = 0.9996
   and xs = 500000. in
@@ -282,8 +282,13 @@ let utm_of' = fun geo ->
     if not (valid_geo pos) then
       invalid_arg "Latlong.utm_of";
     let lambda_deg = truncate (floor ((Rad>>Deg)lambda)) in
-    let zone = (lambda_deg + 180) / 6 + 1 in
-    let lambda_c = (Deg>>Rad) (float (lambda_deg - ((lambda_deg mod 6)+6)mod 6 + 3)) in
+    let zone, lambda_c =
+      match zone with
+      | None ->
+          (lambda_deg + 180) / 6 + 1,
+          (Deg>>Rad) (float (lambda_deg - ((lambda_deg mod 6)+6)mod 6 + 3))
+      | Some z -> z, (Deg>>Rad) (float ((z - 1)*6 - 180 + 3))
+    in
     let ll = latitude_isometrique phi e
     and dl = lambda -. lambda_c in
     let phi' = asin (sin dl /. cosh ll) in
@@ -309,11 +314,11 @@ let utm_of' = fun geo ->
 
 
 (** Static evaluation for better performance (~50% for cputime) *)
-let utm_of =
-  let u_WGS84 = utm_of' WGS84
-  and u_NTF = utm_of' NTF
-  and u_ED50 = utm_of' ED50
-  and u_NAD27 = utm_of' NAD27 in
+let utm_of = fun ?zone ->
+  let u_WGS84 = utm_of' ?zone WGS84
+  and u_NTF = utm_of' ?zone NTF
+  and u_ED50 = utm_of' ?zone ED50
+  and u_NAD27 = utm_of' ?zone NAD27 in
   fun geo -> match geo with
       WGS84 -> u_WGS84
     | NTF -> u_NTF
@@ -541,10 +546,12 @@ type coordinates_kind =
             let l = lambertIIe_of geo in
             Printf.sprintf "%d %d" l.lbt_x l.lbt_y
           | Bearing georef ->
-            let (dx, dy) = utm_sub (utm_of WGS84 geo) (utm_of WGS84 georef#pos) in
-            let d = sqrt (dx*.dx+.dy*.dy) in
-            let bearing = (int_of_float ((Rad>>Deg)(atan2 dx dy)) + 360) mod 360 in
-            Printf.sprintf "%4d %4.0f" bearing d
+            try
+              let (dx, dy) = utm_sub (utm_of WGS84 geo) (utm_of WGS84 georef#pos) in
+              let d = sqrt (dx*.dx+.dy*.dy) in
+              let bearing = (int_of_float ((Rad>>Deg)(atan2 dx dy)) + 360) mod 360 in
+              Printf.sprintf "%4d %4.0f" bearing d
+            with _ -> "Dist across diff utm zones unsupported"
 
 let geographic_of_coordinates = fun kind s ->
   match kind with
